@@ -20,6 +20,10 @@ module paint() {
     color([223, 245, 243]/255) children();
 }
 
+module paint_trim() {
+    color([255, 255, 255]/255) children();
+}
+
 module kitchen() {
     color([0.9,0.9,0.9]) children();
 }
@@ -37,7 +41,27 @@ module window1() {
     br = bl + [38.5,0];
     tl = bl + [0,50];
     tr = br + [0,69];
-    translate([0,0,-10]) linear_extrude( 15 ) polygon([bl,br,tr,tl]);
+    polygon([bl,br,tr,tl]);
+}
+
+trim_height = 3.5;
+trim_depth = 0.5;
+
+module trim_shape() {
+    linear_extrude(trim_depth) difference() {
+        offset(delta=trim_height) children();
+        children();
+    }
+}
+
+module trim_line( start, end ) {
+    delta = end - start;
+    up = [ -delta[1], delta[0] ] / norm( delta );
+    bl = start;
+    br = end;
+    tr = end + up * trim_height;
+    tl = start + up * trim_height;
+    linear_extrude( trim_depth ) polygon( [bl, br, tr, tl] );
 }
 
 fireplace_wall_width = 176;
@@ -49,15 +73,21 @@ module fireplace_wall() {
     tl = bl + [0,95];
     mr = br + [-62,125];
     ml = bl + [62,125];
-    
+
     // wall
-    difference() {
-        paint() wall() polygon([bl, br, tr, mr, ml, tl ]);
+    paint() wall() difference() {
+        polygon([bl, br, tr, mr, ml, tl ]);
         union() {
             translate([9.5,13]) window1();
             translate([br[0]-9.5,13,0]) scale([-1,1]) window1();
         }
     }
+    
+    paint_trim() trim_shape() {
+        translate([9.5,13]) window1();
+        translate([br[0]-9.5,13,0]) scale([-1,1]) window1();
+    }
+    paint_trim() trim_line( bl, br );
 
     // fireplace
     oak() translate([(width-58)/2,0,0]) cube([58,45,4]);
@@ -81,6 +111,7 @@ module left_wall() {
     tr = br + [0,96];
     tl = bl + [0,96];
     paint() wall() polygon([bl, br, tr, tl]);
+    paint_trim() trim_line( bl, br );
 }
 
 module right_wall() {
@@ -89,6 +120,7 @@ module right_wall() {
     tr = br + [0,96];
     tl = bl + [0,96];
     paint() wall() polygon([bl, br, tr, tl]);
+    paint_trim() trim_line( bl, br );
 }
 
 
@@ -103,6 +135,8 @@ module back_wall() {
     lr = br + [-24,0];
     ur = lr + [0,81];
     paint() wall() polygon([bl, ll, ul, ur, lr, br, tr, tl]);
+    paint_trim() trim_line( bl, ll );
+    paint_trim() trim_line( lr, br );
 }
 
 module kitchen_patio() {
@@ -111,6 +145,7 @@ module kitchen_patio() {
     tr = br + [0,96];
     tl = bl + [0,96];
     kitchen() wall() polygon( [bl, br, tr, tl] );
+    paint_trim() trim_line( bl, br );
 }
 
 module kitchen_patio_position() {
@@ -124,6 +159,7 @@ module kitchen_wall() {
     tr = br + [0,96];
     tl = bl + [0,96];
     kitchen() wall() polygon( [bl, br, tr, tl] );
+    paint_trim() trim_line( bl, br );
 }
 
 module kitchen_wall_position() {
@@ -155,9 +191,8 @@ module back_wall_position() {
     children();
 }
 
-fireplace_wall();
+//fireplace_wall();
 
-ignore() {
 wood_floor() translate([0,-400,-1]) cube([300,400,1]); //floor
 plaster() translate([0,-300-76,96]) cube([300,300,6]); // ceiling
 
@@ -170,4 +205,3 @@ fireplace_wall_position() fireplace_wall();
 left_wall_position() left_wall();
 right_wall_position() right_wall();
 back_wall_position() back_wall();
-}
