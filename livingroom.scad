@@ -17,7 +17,17 @@ module wall() {
 }
 
 module paint() {
-    color([223, 245, 243]/255) children();
+    // wildflower prarie
+    //color([201, 206, 225]/255) children();
+    
+    //white snail
+    //color([241, 243, 241]/255) children();
+    
+    // meetinghouse blue
+    //color([118, 156, 171]/255) children();
+    
+    // sea foam mist
+    color([203, 220, 223]/255) children();
 }
 
 module paint_trim() {
@@ -25,7 +35,7 @@ module paint_trim() {
 }
 
 module kitchen() {
-    color([0.9,0.9,0.9]) children();
+    color([194,190,182]/255) children();
 }
 
 module wood_floor() {
